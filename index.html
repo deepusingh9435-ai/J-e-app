@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111827"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><title>JEE Sunday Test</title>
+<style>
+body{font-family:sans-serif;margin:0;background:#f3f4f6;color:#111827}header{background:#111827;color:#fff;padding:18px;display:flex;justify-content:space-between}main{max-width:900px;margin:auto;padding:18px}.card{background:#fff;padding:20px;border-radius:16px;margin-bottom:16px;box-shadow:0 2px 8px #0001}button{width:100%;padding:15px;margin:7px 0;border:2px solid #ddd;border-radius:12px;background:#fff;font-size:16px;text-align:left}.start,.submit{background:#111827;color:#fff;text-align:center;border:0}.timer{font-size:21px;font-weight:bold}.q{font-size:19px;line-height:1.5}.hidden{display:none}.grid{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}.grid button{padding:9px;text-align:center;font-size:13px}.sel{background:#e5e7eb;border-color:#111827}.answered{background:#111827;color:#fff}.small{color:#6b7280}
+@media (max-width:600px){main{padding:10px}.card{padding:14px;border-radius:14px}.grid{grid-template-columns:repeat(7,1fr)}.grid button{padding:8px 3px;font-size:12px}.q{font-size:18px}header{padding:13px 14px;position:sticky;top:0;z-index:5}.opts button{min-height:52px}}
+</style></head>
+<body><header><b>JEE Sunday Test — Week 1</b><span id="timer">90:00</span></header><main>
+<div id="start" class="card"><h2>Week 1</h2><p>Maths: Algebra + Quadratic</p><p>Physics: Units + Vectors + Kinematics</p><p>Chemistry: Mole Concept</p><p><b>45 questions • 90 minutes</b></p><button class="start" onclick="start()">START TEST</button></div>
+<div id="test" class="hidden"><div class="card"><b id="num"></b><div class="q" id="question"></div><div id="opts"></div><button onclick="prev()">← Previous</button><button onclick="next()">Next →</button><button class="submit" onclick="finish()">SUBMIT TEST</button></div><div class="card"><b>Navigator</b><div class="grid" id="nav"></div></div></div>
+<div id="result" class="card hidden"><h2>Result</h2><div id="out"></div></div></main>
+<script>
+const qs=[
+["Maths","If x²-5x+6=0, the sum of squares of roots is:",["13","25","7","19"],0],
+["Maths","For x²-4x+k=0 to have equal roots, k=",["2","4","8","16"],1],
+["Maths","(2+√3)(2-√3)=",["1","2","3","7"],0],
+["Maths","If a+b=7 and ab=10, a²+b²=",["29","39","49","59"],0],
+["Maths","Larger root of x²-7x+10=0:",["2","5","7","10"],1],
+["Maths","|x-3|=5 has sum of solutions:",["-6","0","6","10"],2],
+["Maths","For x²+px+16=0 to have real roots:",["p²<64","p²≥64","p²=16","p²≥16"],1],
+["Maths","Roots 2,-3 give:",["x²+x-6=0","x²-x-6=0","x²+5x+6=0","x²-5x-6=0"],0],
+["Maths","Minimum of x²-6x+11:",["0","1","2","5"],2],
+["Maths","If α+β=4, αβ=1, then 1/α+1/β:",["1","2","4","5"],2],
+["Maths","Discriminant of 2x²+3x+5=0:",["-31","31","-49","49"],0],
+["Maths","If x+1/x=3, x²+1/x²=",["5","7","9","11"],1],
+["Maths","|x|=2 has:",["0","1","2","4"],2],
+["Maths","Double root 3 equation:",["x²+6x+9=0","x²-6x+9=0","x²-3x+9=0","x²+3x+9=0"],1],
+["Maths","For x²-2x-8=0, product of roots:",["-8","-2","2","8"],0],
+["Physics","SI unit of force:",["Joule","Newton","Watt","Pascal"],1],
+["Physics","Dimension of velocity:",["[LT⁻¹]","[L²T⁻¹]","[LT⁻²]","[MLT⁻¹]"],0],
+["Physics","Vector quantity:",["Speed","Distance","Displacement","Mass"],2],
+["Physics","From rest, a=2 m/s² for 5s. Speed:",["5","10","15","20"],1],
+["Physics","u=10, a=2, t=5. Displacement:",["50","60","75","100"],1],
+["Physics","Slope of velocity-time graph:",["Displacement","Acceleration","Speed","Distance"],1],
+["Physics","Constant velocity means acceleration:",["0","1","-1","Cannot say"],0],
+["Physics","Perpendicular vectors 3 and 4 resultant:",["1","5","7","12"],1],
+["Physics","Vector 10 at 60° x-component:",["5","5√3","10","20"],0],
+["Physics","Zero displacement means distance:",["Always zero","Always non-zero","Could be non-zero","Negative"],2],
+["Physics","Dropped from rest, velocity after t:",["gt","g/t","t/g","0"],0],
+["Physics","Dimension of acceleration:",["[LT⁻¹]","[LT⁻²]","[L²T⁻²]","[MLT⁻²]"],1],
+["Physics","Projectile maximum range angle:",["30°","45°","60°","90°"],1],
+["Physics","Equal distances in equal times:",["Uniform","Accelerated","Circular only","Random"],0],
+["Physics","5 m/s east + 12 m/s north resultant:",["7","13","17","60"],1],
+["Chemistry","One mole contains:",["6.022×10²³","6.022×10²²","3.011×10²³","1×10²³"],0],
+["Chemistry","Molar mass H₂O:",["16","18","20","22"],1],
+["Chemistry","18g water contains:",["0.5 mol","1 mol","2 mol","18 mol"],1],
+["Chemistry","11g CO₂ (M=44) moles:",["0.25","0.5","1","4"],0],
+["Chemistry","Avogadro number is particles in:",["1g","1L","1 mol","1kg"],2],
+["Chemistry","Oxygen mass percent in H₂O:",["11.1%","50%","88.9%","94.1%"],2],
+["Chemistry","Empirical formula of C₆H₆:",["C₆H₆","CH","C₂H₂","C₃H₃"],1],
+["Chemistry","5.85g NaCl (58.5) moles:",["0.01","0.1","1","10"],1],
+["Chemistry","1 mol ideal gas at STP approx:",["2.24L","22.4L","224L","1L"],1],
+["Chemistry","2H₂+O₂→2H₂O. O₂ for 2 mol H₂:",["0.5","1","2","4"],1],
+["Chemistry","Limiting reagent is reactant that:",["Has largest mass","Is consumed first","Has largest molar mass","Is always gas"],1],
+["Chemistry","Molarity = moles solute per:",["kg solvent","L solution","g solution","L solvent"],1],
+["Chemistry","10g NaOH in 500mL solution (M=40):",["0.25M","0.5M","1M","2M"],1],
+["Chemistry","3.011×10²³ molecules =:",["0.25 mol","0.5 mol","1 mol","2 mol"],1],
+["Chemistry","Moles formula:",["mM","M/m","m/M","m+M"],2]
+];
+let i=Number(localStorage.getItem('jee_i')||0),a=JSON.parse(localStorage.getItem('jee_answers')||'null')||Array(45).fill(-1),sec=Number(localStorage.getItem('jee_sec')||5400),t=null,started=localStorage.getItem('jee_started')==='1';
+const startEl=document.getElementById('start');
+function save(){localStorage.setItem('jee_i',i);localStorage.setItem('jee_answers',JSON.stringify(a));localStorage.setItem('jee_sec',sec);localStorage.setItem('jee_started',started?'1':'0')}
+function start(){started=true;startEl.classList.add('hidden');test.classList.remove('hidden');draw();clearInterval(t);t=setInterval(()=>{sec--;tm();save();if(sec<=0)finish()},1000);save()}
+function tm(){timer.textContent=String(Math.max(0,Math.floor(sec/60))).padStart(2,'0')+':'+String(Math.max(0,sec%60)).padStart(2,'0')}
+function draw(){let q=qs[i];num.textContent=`Question ${i+1}/45 • ${q[0]}`;question.textContent=q[1];opts.innerHTML=q[2].map((x,j)=>`<button class="${a[i]==j?'sel':''}" onclick="a[i]=${j};save();draw()">${'ABCD'[j]}. ${x}</button>`).join('');nav.innerHTML=qs.map((_,j)=>`<button class="${a[j]>=0?'answered':''} ${j===i?'sel':''}" onclick="i=${j};save();draw()">${j+1}</button>`).join('');tm()}
+function next(){if(i<44)i++;save();draw()} function prev(){if(i>0)i--;save();draw()}
+function finish(){clearInterval(t);let c=0,w=0,u=0;qs.forEach((q,j)=>a[j]<0?u++:a[j]==q[4]?c++:w++);let s=c*4-w;test.classList.add('hidden');result.classList.remove('hidden');out.innerHTML=`<p><b>Score:</b> ${s}/180</p><p><b>Correct:</b> ${c} &nbsp; <b>Wrong:</b> ${w} &nbsp; <b>Unattempted:</b> ${u}</p><p><b>Accuracy:</b> ${Math.round(c/(c+w||1)*100)}%</p><p><b>Attempted:</b> ${c+w}/45</p><button onclick="location.reload()">BACK TO HOME</button>`;localStorage.removeItem('jee_started')}
+window.addEventListener('load',()=>{tm();if(started && sec>0){startEl.classList.add('hidden');test.classList.remove('hidden');draw();clearInterval(t);t=setInterval(()=>{sec--;tm();save();if(sec<=0)finish()},1000)}});
+window.addEventListener('beforeunload',save);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+</script></body></html>
